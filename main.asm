@@ -49,7 +49,7 @@ ContLeftMan:
 	cp 89 			
 	kjp(z,SelectHyd)
 	cp 19
-	ijp(z,ContLCheck)
+	kjp(z,ContLCheck)
 	cp 64
 	kjp(z,CheckLeft)
 ContLeft:
@@ -78,7 +78,7 @@ ContRC:
 	cp 84
 	kjp(z,ContRC2)
 ContRight:
-	kcall RemSel)
+	kcall(RemSel)
 	kld(a,(selectx))
 	add a,5
 	kld((selectx),a)
