@@ -21,68 +21,61 @@ start:
     pcall(getLcdLock)
     pcall(getKeypadLock)
 
-Restart:
     pcall(allocScreenBuffer)
     pcall(clearBuffer)
 
-    xor a
-    kld(hl, window_title)
-    corelib(drawWindow)
-
-    kcall(DrawTable);Draw out the Periodic Table Wireframe
-    kjp(Selector)    ;Draw out the selector for the first time
-
-KeyLoop:            ;The KeyLoop Starts here
+    kcall(draw_ui)
+main_loop:
     pcall(flushKeys)
     corelib(appWaitKey)
-    cp kClear
-    ret z
+    kcall(nz, draw_ui)
     cp kMODE
     ret z
     cp kLeft
-    jr z, MoveLeft
+    ;jr z, MoveLeft
     cp kRight
-    jr z, MoveRight
-    cp kEnter
-    kjp(z, ElemInfo)
-    cp kQuestion
-    kjp(z, HelpScreen)
-    jr KeyLoop        ;Reloop.
+    ;jr z, MoveRight
+    jr main_loop
 
-Selector:            ;Draws a 4x4 black box at coordinates selectx/selecty
-    kcall(DrawSel)        ;Call the XOR routine
-    kcall(DispData)        ;Display the Data!
-    pcall(fastCopy)    ;Copy it
-    kjp(KeyLoop)        ;Goto the loop
+draw_ui:
+    pcall(clearBuffer)
+    xor a
+    kld(hl, window_title)
+    corelib(drawWindow)
+    kcall(draw_table)
+    kcall(draw_element_info)
+    kcall(xor_selector)
+    pcall(fastCopy)
+    ret
+
 .equ table_x 2
 .equ table_y 17
-
-RemSel:                ;If we only want to remove it, then save time by not copying the
-DrawSel:            ;grbuf and by returning rather than going to the KeyLoop.
+xor_selector:
     kld(a,(selectx))
-    ld b,a            ;X-Position should go into b
+    ld b, a
     kld(a,(selecty))
-    ld c,a            ;Y-Position should go into c
-    kcall(VertLoop)        ;Draw 3 pixels
-    dec c            ;Goto next line, this is decrease because 
-    kcall(VertLoop)        ;Ti's _IPoint Y-Coordinates are flipped.
-    dec c            ;Same with _ILine.  This VertLoop is gone
-VertLoop:        ;Displays 4 pixels vertically
+    ld c, a
+    kcall(.vertical_loop)
+    dec c
+    kcall(.vertical_loop)
+    dec c
+; Displays 4 pixels vertically
+.vertical_loop:
     kld(a,(selectx))
-    ld b,a            ;Reset the X-Coordinate
-    ld a,3            ;Loop 4 times, using a
-Loop:
-    kcall(_IPoint)        ;Draw the point ; TODO: Shim this
-    inc b            ;Increase the X
-    dec a            ;Decrease A
-    jr nz,Loop        ;If its not 0, then reloop.
+    ld b, a
+    ld a, 3
+.loop:
+    kcall(_IPoint)
+    inc b
+    dec a
+    jr nz, .loop
     ret
 
 ; Draws out the wireframe of the periodic table.
 ; This was not very easy to do, as you can imagine :P
-DrawTable:
+draw_table:
 .equ lower_x 0 + table_x
-.equ lower_y 0 + table_y
+.equ lower_y -1 + table_y
 .equ upper_x 0 + table_x
 .equ upper_y 10 + table_y
 .macro line(x1, y1, x2, y2)
@@ -94,7 +87,7 @@ DrawTable:
     ld bc, (x1 + upper_x) * 256 + (y1 + upper_y)
     ld de, (x2 + upper_x) * 256 + (y2 + upper_y)
     ld a, rep
-    kcall(LineLooper)
+    kcall(draw_lines)
 .endmacro
 .macro lower_line(x1, y1, x2, y2)
     ld bc, (x1 + lower_x) * 256 + (y1 + lower_y)
@@ -105,7 +98,7 @@ DrawTable:
     ld bc, (x1 + lower_x) * 256 + (y1 + lower_y)
     ld de, (x2 + lower_x) * 256 + (y2 + lower_y)
     ld a, rep
-    kcall(LineLooper)
+    kcall(draw_lines)
 .endmacro
 
     ; Upper section, horizontal
@@ -139,23 +132,29 @@ DrawTable:
     line(72, 29, 72, 5)
 
     ; Lower section, horizontal
-    lower_line(1, 1, 56, 1) ; Bottom to top
-    lower_line(1, 5, 56, 5)
-    lower_line(1, 9, 56, 9)
+    lower_line(1, 1, 60, 1) ; Bottom to top
+    lower_line(1, 5, 60, 5)
+    lower_line(1, 9, 60, 9)
 
     ; Lower section, vertical
-    lower_looplines(-4, 9, -4, 1, 15) ; Left to right
+    lower_looplines(-4, 9, -4, 1, 16) ; Left to right
+
+    ld d, 12
+    ld e, 32
+    ld h, 12
+    ld l, 39
+    pcall(drawLine) ; Connect the upper and lower tables
     ret
 
-LineLooper:
+draw_lines:
     inc b \ inc b \ inc b \ inc b
     inc d \ inc d \ inc d \ inc d
     kcall(_ILine)
     dec a
-    jr nz,LineLooper
+    jr nz, draw_lines
     ret
 
-DispData:
+draw_element_info:
     ld bc, 6*256+50
     ld e, 2
     ld l, 50
