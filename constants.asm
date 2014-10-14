@@ -3,25 +3,6 @@ corelib_path:
 window_title:
     .db "Periodic Table", 0
 
-ElemText:
- .db "  Element Info  ", 0
-Data:
- .db "Element:",0
-Data_2:
- .db "Symbol:\n"
- .db "Atomic No:\n"
- .db "Atomic Mass:",0
-HelpStr:
- .db "[?]: Help",0
-
-HelpText:
- .db " Periodic Table "
- .db "                "
- .db "Arrows   -  Move"
- .db "Enter    -  Info"
- .db "Mode     -  Help"
- .db "Clear    -  Quit",0
-
 Elements:
  .db "Hydrogen",0
  .db "Helium",0
@@ -79,7 +60,6 @@ Elements:
  .db "Xenon",0
  .db "Cesium",0
  .db "Barium",0
- .db "Lanthanum",0
  .db "Hafnium",0
  .db "Tantalum",0
  .db "Tungsten",0
@@ -96,15 +76,16 @@ Elements:
  .db "Astatine",0
  .db "Radon",0
  .db "Francium",0
+
  .db "Radium",0
- .db "Actinum",0
- .db "Unnilquadium",0
- .db "Unnilpentium",0
- .db "Unnihexium",0
- .db "Unnilseptium",0
- .db "Unniloctium",0
- .db "Unnilennium",0
- .db "Ununnilium",0
+ .db "Rutherfordium",0
+ .db "Dubnium",0
+ .db "Seaborgium",0
+ .db "Bohrium",0
+ .db "Hassium",0
+ .db "Meitnerium",0
+ .db "Darmastadtium",0
+
  .db "Cerium",0
  .db "Praseodymium",0
  .db "Neodymium",0
@@ -191,7 +172,6 @@ AtomicNo:
  .db "54",0
  .db "55",0
  .db "56",0
- .db "57",0
  .db "72",0
  .db "73",0
  .db "74",0
@@ -209,7 +189,6 @@ AtomicNo:
  .db "86",0
  .db "87",0
  .db "88",0
- .db "89",0
  .db "104",0
  .db "105",0
  .db "106",0
@@ -217,6 +196,8 @@ AtomicNo:
  .db "108",0
  .db "109",0
  .db "110",0
+
+ .db "57",0
  .db "58",0
  .db "59",0
  .db "60",0
@@ -231,6 +212,7 @@ AtomicNo:
  .db "69",0
  .db "70",0
  .db "71",0
+ .db "89",0
  .db "90",0
  .db "91",0
  .db "92",0
@@ -303,7 +285,6 @@ Symbols:
  .db "Xe",0
  .db "Cs",0
  .db "Ba",0
- .db "La",0
  .db "Hf",0
  .db "Ta",0
  .db "W",0
@@ -321,7 +302,6 @@ Symbols:
  .db "Rn",0
  .db "Fr",0
  .db "Ra",0
- .db "Ac",0
  .db "Unq",0
  .db "Unp",0
  .db "Unh",0
@@ -329,6 +309,7 @@ Symbols:
  .db "Uno",0
  .db "Une",0
  .db "Uun",0
+ .db "La",0
  .db "Ce",0
  .db "Pr",0
  .db "Nd",0
@@ -343,6 +324,7 @@ Symbols:
  .db "Tm",0
  .db "Yb",0
  .db "Lu",0
+ .db "La",0
  .db "Th",0
  .db "Pa",0
  .db "U",0
@@ -415,7 +397,6 @@ MassNo:
  .db "131.3",0
  .db "132.9",0
  .db "137.3",0
- .db "138.9",0
  .db "178.5",0
  .db "180.9",0
  .db "183.9",0
@@ -433,7 +414,6 @@ MassNo:
  .db "(222)",0
  .db "(223)",0
  .db "(226)",0
- .db "(227)",0
  .db "(261)",0
  .db "(262)",0
  .db "(263)",0
@@ -441,6 +421,7 @@ MassNo:
  .db "(265)",0
  .db "(266)",0
  .db "(272)",0
+ .db "138.9",0
  .db "140.1",0
  .db "140.9",0
  .db "144.2",0
@@ -455,6 +436,7 @@ MassNo:
  .db "168.9",0
  .db "173.0",0
  .db "174.9",0
+ .db "(227)",0
  .db "232.0",0
  .db "231.0",0
  .db "238.0",0
