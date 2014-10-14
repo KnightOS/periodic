@@ -12,11 +12,36 @@
     .db KEXC_HEADER_END
 program_name:
     .db "Periodic Table", 0
+
+; Shims
+_ILine:
+    push hl
+    push de
+    push bc
+	ld h, d \ ld l, e ; X2, Y2
+	ld d, b \ ld e, c ; X1, Y1
+	pcall(drawLine)
+    pop bc
+    pop de
+    pop hl
+    ret
+
+_IPoint:
+    push af
+    push hl
+	ld a, e ; X
+	ld l, c ; Y
+	pcall(setPixel)
+    pop hl
+    pop af
+    ret
+
 start:
 	pcall(getLcdLock)
 	pcall(getKeypadLock)
 
 Restart:
+	pcall(allocScreenBuffer)
 	pcall(clearBuffer)
 
 	kcall(DrawTable);Draw out the Periodic Table Wireframe
@@ -153,12 +178,11 @@ CheckLeft:
 
 Selector:			;Draws a 4x4 black box at coordinates selectx/selecty
 	kcall(DrawSel)		;Call the XOR routine
-	ld h, 1
 	ld bc,63*256+57
 	ld de,63*256+33
 	kcall(_ILine) ; TODO: Shim this
 	kcall(DispData)		;Display the Data!
-	kcall(ionFastCopy)	;Copy it
+	pcall(fastCopy)	;Copy it
 	kjp(KeyLoop)		;Goto the loop
 
 ContLeftC:
@@ -276,7 +300,6 @@ Loop:
 
 DrawTable:		;Draws out the wireframe of the periodic table.
 			;This was not very easy to do, as you can imagine :P
-	ld h,1
 	ld bc,3*256+47
 	ld de,93*256+47
 	kcall(_ILine)
@@ -393,11 +416,11 @@ DispData:
 	set 7,(iy+$14)
 ;--------------
 	ld hl,6*256+15
-	kld((pencol),hl)
+	;kld((pencol),hl) ; bcall (for grep)
 	ld b,48
 DispBlank:			;This code clears the spots
 	ld a,' '		;at which we want to write on.
-	bcall(_vputmap)
+	;bcall(_vputmap)
 	djnz DispBlank
 ;--------------
 	ld de,0*256+15
@@ -408,21 +431,19 @@ DispBlank:			;This code clears the spots
 	ld hl,Elements
 	kcall(getString)
 	ld de,6*256+15
-	call fvputs
+	kcall(fvputs)
 
 	ld de,34*256+61
 	kld(hl,HelpStr)
-	call fvputs
+	kcall(fvputs)
 	ret
 
 ElemInfo:
 	kcall(Clear)
 	; TODO: Fix this, too
-	bcall(_homeup)
 	kld(hl,ElemText)
-	bcall(_puts)
+	;bcall(_puts)
 
-	ld h, 1
 	ld bc,11*256+55
 	ld de,83*256+55
 	kcall(_ILine)
@@ -477,21 +498,16 @@ Clear: ; TODO: This is useless, refactor it out
 HelpScreen:
 	kcall(Clear)
 	; TODO: Probably rewriting this, too
-	bcall(_homeup)
 	ld hl,HelpText
-	bcall(_puts)
+	;bcall(_puts)
 
-	ld de, 56*256+8
-	ld hl, Porter
-	call fvputs
-	ld h, 1
 	ld bc,5*256+55
 	ld de,89*256+55
-	bcall(_ILine)
+	kcall(_ILine)
 
-	bcall(_getkey)
-	call Clear
-	jp Restart
+	pcall(waitKey)
+	kcall(Clear)
+	kjp(Restart)
 
 ;---------= Point hl to string a =---------;
 ; by: Joe Wingerbermuhle                   ;
@@ -518,8 +534,8 @@ getStringL1:
 
 fvputs:
 	; TODO: Shim this or something
-	ld (pencol),de
-	bcall(_vputs)
+	;ld (pencol),de
+	;bcall(_vputs)
 	ret
 
 ;---------------------------------------;
