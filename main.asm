@@ -79,7 +79,11 @@ main_loop:
         jr .down_loop
 .down_restore:
     pop af
+    inc a
+    kld((current), a)
+    jr main_loop
 .down_save:
+    inc sp \ inc sp
     inc a
     kld((current), a)
     jr main_loop
@@ -107,7 +111,11 @@ main_loop:
         jr .up_loop
 .up_restore:
     pop af
+    inc a
+    kld((current), a)
+    kjp(main_loop)
 .up_save:
+    inc sp \ inc sp
     inc a
     kld((current), a)
     kjp(main_loop)
