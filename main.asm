@@ -270,12 +270,10 @@ DrawSel:            ;grbuf and by returning rather than going to the KeyLoop.
     dec c            ;Goto next line, this is decrease because 
     kcall(VertLoop)        ;Ti's _IPoint Y-Coordinates are flipped.
     dec c            ;Same with _ILine.  This VertLoop is gone
-    kcall(VertLoop)        ;through four times to achieve 4 lines.
-    dec c
 VertLoop:        ;Displays 4 pixels vertically
     kld(a,(selectx))
     ld b,a            ;Reset the X-Coordinate
-    ld a,4            ;Loop 4 times, using a
+    ld a,3            ;Loop 4 times, using a
 Loop:
     kcall(_IPoint)        ;Draw the point ; TODO: Shim this
     inc b            ;Increase the X
@@ -286,119 +284,60 @@ Loop:
 ; Draws out the wireframe of the periodic table.
 ; This was not very easy to do, as you can imagine :P
 DrawTable:
-    ; Start of upper horizontal lines
-    ld bc,3*256+47
-    ld de,93*256+47
+.macro line(x1, y1, x2, y2)
+    ld bc, x1 * 256 + y1
+    ld de, x2 * 256 + y2
     kcall(_ILine)
-    ld bc,3*256+42
-    ld de,93*256+42
-    kcall(_ILine)
-    ld bc,3*256+37
-    ld de,93*256+37
-    kcall(_ILine)
-    ld bc,3*256+32
-    ld de,93*256+32
-    kcall(_ILine)
-    ld bc,18*256+27
-    ld de,58*256+27
-    kcall(_ILine)
-    ld bc,63*256+52
-    ld de,93*256+52
-    kcall(_ILine)
-    ld bc,63*256+57
-    ld de,93*256+57
-    kcall(_ILine)
-    ld bc,88*256+62
-    ld de,93*256+62
-    kcall(_ILine)
-    ld bc,3*256+57
-    ld de,13*256+57
-    kcall(_ILine)
-    ld bc,3*256+52
-    ld de,13*256+52
-    kcall(_ILine)
-    ; End of upper horizontal lines
-
-    ; Some of the upper vertical lines
-    ld bc,3*256+62
-    ld de,7*256+62
-    kcall(_ILine)
-    ld bc,3*256+47
-    ld de,13*256+47
-    kcall(_ILine)
-    ld bc,3*256+42
-    ld de,13*256+42
-    kcall(_ILine)
-    ld bc,3*256+37
-    ld de,13*256+37
-    kcall(_ILine)
-    ld bc,3*256+27
-    ld de,13*256+27
-    kcall(_ILine)
-    ld bc,3*256+62
-    ld de,3*256+28
-    kcall(_ILine)
-    ld bc,93*256+62
-    ld de,93*256+38
-    kcall(_ILine)
-    ld bc,8*256+62
-    ld de,8*256+28
-    kcall(_ILine)
-    ld bc,13*256+57
-    ld de,13*256+28
-    kcall(_ILine)
-    ld bc,88*256+62
-    ld de,88*256+33
-    kcall(_ILine)
-    ld bc,83*256+57
-    ld de,83*256+33
-    kcall(_ILine)
-    ld bc,78*256+57
-    ld de,78*256+33
-    kcall(_ILine)
-    ld bc,73*256+57
-    ld de,73*256+33
-    kcall(_ILine)
-    ld bc,68*256+57
-    ld de,68*256+33
-    kcall(_ILine)
-    ld bc,63*256+57
-    ld de,63*256+33
-    kcall(_ILine)
-    ; End upper vertical lines
-
-    ; Start of lower horizontal lines
-    ld bc,18*256+10
-    ld de,87*256+10
-    kcall(_ILine)
-    ld bc,18*256+15
-    ld de,87*256+15
-    kcall(_ILine)
-    ld bc,18*256+20
-    ld de,87*256+20
-    kcall(_ILine)
-    ; End of lower horizontal lines
-
-    ld bc,13*256+47
-    ld de,13*256+33
-    ld a,16
+    pcall(fastCopy)
+    pcall(flushKeys)
+    pcall(waitKey)
+.endmacro
+.macro looplines(x1, y1, x2, y2, rep)
+    ld bc, x1 * 256 + y1
+    ld de, x2 * 256 + y2
+    ld a, rep
     kcall(LineLooper)
+.endmacro
 
-    ld bc,13*256+38
-    ld de,13*256+33
-    ld a,10
-    kcall(LineLooper)
+    ; Upper section, horizontal
+    line(3, 47, 93, 47)
+    line(3, 42, 93, 42)
+    line(3, 37, 93, 37)
+    line(3, 32, 93, 32)
+    line(18, 27, 58, 27) ; Main group, top to bottom
 
-    ld bc,13*256+33
-    ld de,13*256+28
-    ld a,9
-    kcall(LineLooper)
+    line(63, 52, 93, 52)
+    line(63, 57, 93, 57)
+    line(88, 62, 93, 62) ; Upper right, bottom to top
 
-    ; Lower lines
-    ld bc,13*256+20
-    ld de,13*256+10
-    ld a,15
-    kcall(LineLooper)
+    line(3, 52, 13, 52)
+    line(3, 57, 13, 57)
+    line(3, 62, 7, 62)   ; Upper left, bottom to top
+
+    line(3, 27, 13, 27) ; Bottom left, one-shot
+
+    ; Upper section, vertical
+    line(3, 62, 3, 28) ; Left to right
+    line(8, 62, 8, 28)
+    line(13, 57, 13, 28)
+    looplines(13, 47, 13, 33, 16)
+    looplines(13, 38, 13, 33, 10)
+    looplines(13, 33, 13, 28, 9)
+    line(63, 57, 63, 33)
+    line(68, 57, 68, 33)
+    line(73, 57, 73, 33)
+    line(78, 57, 78, 33)
+    line(83, 57, 83, 33)
+    line(88, 62, 88, 33)
+    line(93, 62, 93, 38)
+
+    ; Lower section, horizontal
+    line(18, 10, 87, 10) ; Bottom to top
+    line(18, 15, 87, 15)
+    line(18, 20, 87, 20)
+
+    ; Lower section, vertical
+    looplines(13, 20, 13, 10, 15) ; Left to right
     ret
 
 LineLooper:
