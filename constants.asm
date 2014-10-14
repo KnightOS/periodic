@@ -456,6 +456,7 @@ MassNo:
  .db "(259)",0
  .db "(262)",0
 
+    .db 0
 cursorPos:
     .db 3, 55  ; H
     .db 71, 55 ; He
@@ -579,3 +580,4 @@ cursorPos:
     .db 55, 20
     .db 59, 20 ; Lr
 cursorPos_end:
+    .db 0

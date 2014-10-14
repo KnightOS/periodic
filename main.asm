@@ -35,6 +35,10 @@ main_loop:
     jr z, .left
     cp kRight
     jr z, .right
+    cp kDown
+    jr z, .down
+    cp kUp
+    jr z, .up
     jr .key_loop
 
 .left:
@@ -51,6 +55,62 @@ main_loop:
     jr z, main_loop
     kld((current), a)
     jr main_loop
+
+.down:
+    ; Searches the cursor list for the next one with the same X value
+    kld(a, (current))
+    dec a
+    kld(hl, CursorPos)
+    ld d, a ; New "current" value
+    push af
+        add a, a
+        add a, l \ ld l, a \ jr nc, $+3 \ inc h
+        ld b, (hl) ; Current X position
+        inc hl \ inc hl
+.down_loop:
+        inc d
+        ld a, (hl)
+        or a
+        jr z, .down_restore
+        cp b
+        ld a, d
+        jr z, .down_save
+        inc hl \ inc hl
+        jr .down_loop
+.down_restore:
+    pop af
+.down_save:
+    inc a
+    kld((current), a)
+    jr main_loop
+
+.up:
+    ; Searches the cursor list for the next one with the same X value
+    kld(a, (current))
+    dec a
+    kld(hl, CursorPos)
+    ld d, a ; New "current" value
+    push af
+        add a, a
+        add a, l \ ld l, a \ jr nc, $+3 \ inc h
+        ld b, (hl) ; Current X position
+        dec hl \ dec hl
+.up_loop:
+        dec d
+        ld a, (hl)
+        or a
+        jr z, .up_restore
+        cp b
+        ld a, d
+        jr z, .up_save
+        dec hl \ dec hl
+        jr .up_loop
+.up_restore:
+    pop af
+.up_save:
+    inc a
+    kld((current), a)
+    kjp(main_loop)
 
 draw_ui:
     pcall(clearBuffer)
