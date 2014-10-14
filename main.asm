@@ -18,9 +18,15 @@ _ILine:
     push hl
     push de
     push bc
+    push af
 	ld h, d \ ld l, e ; X2, Y2
 	ld d, b \ ld e, c ; X1, Y1
+	; Apparently ILine is "backwards" on TIOS
+	; So we'll invert the Y coords
+	ld a, e \ sub a, 32 \ neg \ add a, 32 \ ld e, a
+	ld a, l \ sub a, 32 \ neg \ add a, 32 \ ld l, a
 	pcall(drawLine)
+    pop af
     pop bc
     pop de
     pop hl
@@ -29,14 +35,23 @@ _ILine:
 _IPoint:
     push af
     push hl
-	ld a, e ; X
 	ld l, c ; Y
-	pcall(setPixel)
+	; Invert Y coordinate
+	ld a, l \ sub a, 32 \ neg \ add a, 32 \ ld l, a
+	ld a, b ; X
+	pcall(invertPixel)
     pop hl
     pop af
     ret
 
 start:
+	ld a,4			;Set up some coordinates for the box
+	kld((selectx),a)		;and for _IPoint routine.  Note that
+	ld a,61			;the Y-Coordinates are actually flipped
+	kld((selecty),a)		;due to Ti's _IPoint requirements.
+	ld a,1
+	kld((current),a)
+
 	pcall(getLcdLock)
 	pcall(getKeypadLock)
 
@@ -48,7 +63,8 @@ Restart:
 	kjp(Selector)	;Draw out the selector for the first time
 
 KeyLoop:			;The KeyLoop Starts here
-	pcall(getKey)
+	pcall(flushKeys)
+	pcall(waitKey)
 	cp kClear
 	ret z
 	cp kMODE
@@ -276,7 +292,6 @@ PrevRow:
 
 RemSel:				;If we only want to remove it, then save time by not copying the
 DrawSel:			;grbuf and by returning rather than going to the KeyLoop.
-	ld d,2			;D is set to two here for XOR, so it can be used as an XOR routine.
 	kld(a,(selectx))
 	ld b,a			;X-Position should go into b
 	kld(a,(selecty))
@@ -413,7 +428,6 @@ LineLooper:
 
 DispData:
 	; TODO: This probably just needs to be rewritten
-	set 7,(iy+$14)
 ;--------------
 	ld hl,6*256+15
 	;kld((pencol),hl) ; bcall (for grep)
