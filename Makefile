@@ -4,7 +4,7 @@ include .knightos/variables.make
 ALL_TARGETS:=$(BIN)periodic
 
 # This is all the make targets to produce said files
-$(BIN)periodic: main.asm
+$(BIN)periodic: *.asm
 	mkdir -p $(BIN)
 	$(AS) $(ASFLAGS) --listing $(OUT)main.list main.asm $(BIN)periodic
 

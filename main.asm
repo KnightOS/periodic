@@ -27,7 +27,7 @@ Restart:
 
     xor a
     kld(hl, window_title)
-    ;corelib(drawWindow)
+    corelib(drawWindow)
 
     kcall(DrawTable);Draw out the Periodic Table Wireframe
     kjp(Selector)    ;Draw out the selector for the first time
@@ -164,9 +164,6 @@ CheckLeft:
 
 Selector:            ;Draws a 4x4 black box at coordinates selectx/selecty
     kcall(DrawSel)        ;Call the XOR routine
-    ld bc,63*256+57
-    ld de,63*256+33
-    kcall(_ILine) ; TODO: Shim this
     kcall(DispData)        ;Display the Data!
     pcall(fastCopy)    ;Copy it
     kjp(KeyLoop)        ;Goto the loop
@@ -260,6 +257,9 @@ PrevRow:
     dec (hl)
     kjp(Selector)
 
+.equ table_x 2
+.equ table_y 17
+
 RemSel:                ;If we only want to remove it, then save time by not copying the
 DrawSel:            ;grbuf and by returning rather than going to the KeyLoop.
     kld(a,(selectx))
@@ -284,88 +284,122 @@ Loop:
 ; Draws out the wireframe of the periodic table.
 ; This was not very easy to do, as you can imagine :P
 DrawTable:
+.equ lower_x 0 + table_x
+.equ lower_y 0 + table_y
+.equ upper_x 0 + table_x
+.equ upper_y 10 + table_y
 .macro line(x1, y1, x2, y2)
-    ld bc, x1 * 256 + y1
-    ld de, x2 * 256 + y2
+    ld bc, (x1 + upper_x) * 256 + (y1 + upper_y)
+    ld de, (x2 + upper_x) * 256 + (y2 + upper_y)
     kcall(_ILine)
-    pcall(fastCopy)
-    pcall(flushKeys)
-    pcall(waitKey)
 .endmacro
 .macro looplines(x1, y1, x2, y2, rep)
-    ld bc, x1 * 256 + y1
-    ld de, x2 * 256 + y2
+    ld bc, (x1 + upper_x) * 256 + (y1 + upper_y)
+    ld de, (x2 + upper_x) * 256 + (y2 + upper_y)
+    ld a, rep
+    kcall(LineLooper)
+.endmacro
+.macro lower_line(x1, y1, x2, y2)
+    ld bc, (x1 + lower_x) * 256 + (y1 + lower_y)
+    ld de, (x2 + lower_x) * 256 + (y2 + lower_y)
+    kcall(_ILine)
+.endmacro
+.macro lower_looplines(x1, y1, x2, y2, rep)
+    ld bc, (x1 + lower_x) * 256 + (y1 + lower_y)
+    ld de, (x2 + lower_x) * 256 + (y2 + lower_y)
     ld a, rep
     kcall(LineLooper)
 .endmacro
 
     ; Upper section, horizontal
-    line(3, 47, 93, 47)
-    line(3, 42, 93, 42)
-    line(3, 37, 93, 37)
-    line(3, 32, 93, 32)
-    line(18, 27, 58, 27) ; Main group, top to bottom
+    line(0, 29, 4, 29)   ; Upper left, top to bottom (staggered)
+    line(68, 29, 72, 29) ; Upper right, bottom to top (staggered)
+    line(0, 25, 8, 25)
+    line(48, 25, 72, 25)
+    line(0, 21, 8, 21)
+    line(48, 21, 72, 21)
 
-    line(63, 52, 93, 52)
-    line(63, 57, 93, 57)
-    line(88, 62, 93, 62) ; Upper right, bottom to top
+    line(0, 17, 72, 17)
+    line(0, 13, 72, 13)
+    line(0, 9, 72, 9)
+    line(0, 5, 72, 5)
+    line(12, 1, 44, 1) ; Main group, top to bottom
 
-    line(3, 52, 13, 52)
-    line(3, 57, 13, 57)
-    line(3, 62, 7, 62)   ; Upper left, bottom to top
-
-    line(3, 27, 13, 27) ; Bottom left, one-shot
+    line(0, 1, 8, 1) ; Bottom left, one-shot
 
     ; Upper section, vertical
-    line(3, 62, 3, 28) ; Left to right
-    line(8, 62, 8, 28)
-    line(13, 57, 13, 28)
-    looplines(13, 47, 13, 33, 16)
-    looplines(13, 38, 13, 33, 10)
-    looplines(13, 33, 13, 28, 9)
-    line(63, 57, 63, 33)
-    line(68, 57, 68, 33)
-    line(73, 57, 73, 33)
-    line(78, 57, 78, 33)
-    line(83, 57, 83, 33)
-    line(88, 62, 88, 33)
-    line(93, 62, 93, 38)
+    line(0, 29, 0, 1) ; Left to right
+    line(4, 29, 4, 1)
+    line(8, 24, 8, 1)
+    looplines(8, 17, 8, 5, 16)
+    looplines(8, 4, 8, 1, 9)
+    line(48, 24, 48, 5)
+    line(52, 24, 52, 5)
+    line(56, 24, 56, 5)
+    line(60, 24, 60, 5)
+    line(64, 24, 64, 5)
+    line(68, 29, 68, 5)
+    line(72, 29, 72, 5)
 
     ; Lower section, horizontal
-    line(18, 10, 87, 10) ; Bottom to top
-    line(18, 15, 87, 15)
-    line(18, 20, 87, 20)
+    lower_line(1, 1, 56, 1) ; Bottom to top
+    lower_line(1, 5, 56, 5)
+    lower_line(1, 9, 56, 9)
 
     ; Lower section, vertical
-    looplines(13, 20, 13, 10, 15) ; Left to right
+    lower_looplines(-4, 9, -4, 1, 15) ; Left to right
     ret
 
 LineLooper:
-    inc b \ inc b \ inc b \ inc b \ inc b
-    inc d \ inc d \ inc d \ inc d \ inc d
+    inc b \ inc b \ inc b \ inc b
+    inc d \ inc d \ inc d \ inc d
     kcall(_ILine)
     dec a
     jr nz,LineLooper
     ret
 
 DispData:
-    ld bc, 16*256+48
-    ld e, 15
-    ld l, 0
+    ld bc, 6*256+50
+    ld e, 2
+    ld l, 50
     pcall(rectAND)
-
-    ld de,15*256+0
-    kld(hl, Data)
-    pcall(drawStr)
     kld(a,(current))
     dec a
     kld(hl,Elements)
     kcall(getString)
-    ld de,15*256+6
+    ld de,2*256+50
     pcall(drawStr)
 
-    ld de,61*256+34
-    kld(hl,HelpStr)
+    ; Draw box
+    ld bc, 21*256+21
+    ld e, 73
+    ld l, 34
+    pcall(rectOR)
+    ld bc, 19*256+19
+    ld e, 74
+    ld l, 35
+    pcall(rectAND)
+    kld(a, (current))
+    ld de, 75*256+36
+    pcall(drawDecA)
+    kld(a, (current))
+    dec a
+    kld(hl, Symbols)
+    kcall(getString)
+    inc hl
+    ld a, (hl)
+    dec hl
+    or a
+    jr z, _
+    ld de, 81*256+42
+    jr ++_
+_:  ld de, 82*256+42
+_:  pcall(drawStr)
+    kld(a, (current))
+    dec a
+    kld(hl, massNo)
+    kcall(getString)
+    ld de, 75*256+48
     pcall(drawStr)
     ret
 
@@ -475,9 +509,9 @@ fvputs:
 ;---------------------------------------;
 
 selectx:
-    .db 4 ; Initial X position
+    .db 3 ; Initial X position
 selecty:
-    .db 61 ; Initial Y position (inverted)
+    .db 55 ; Initial Y position (inverted)
 current:
     .db 1 ; First element
 
