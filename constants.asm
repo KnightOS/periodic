@@ -76,7 +76,6 @@ Elements:
  .db "Astatine",0
  .db "Radon",0
  .db "Francium",0
-
  .db "Radium",0
  .db "Rutherfordium",0
  .db "Dubnium",0
@@ -85,7 +84,8 @@ Elements:
  .db "Hassium",0
  .db "Meitnerium",0
  .db "Darmastadtium",0
-
+ .db "Roentgnium",0
+ .db "Lanthanum",0
  .db "Cerium",0
  .db "Praseodymium",0
  .db "Neodymium",0
@@ -100,6 +100,7 @@ Elements:
  .db "Thulium",0
  .db "Ytterbium",0
  .db "Lutetium",0
+ .db "Actinium",0
  .db "Thorium",0
  .db "Protactinium",0
  .db "Uranium",0
@@ -196,6 +197,7 @@ AtomicNo:
  .db "108",0
  .db "109",0
  .db "110",0
+ .db "111",0
 
  .db "57",0
  .db "58",0
@@ -302,13 +304,14 @@ Symbols:
  .db "Rn",0
  .db "Fr",0
  .db "Ra",0
- .db "Unq",0
- .db "Unp",0
- .db "Unh",0
- .db "Uns",0
- .db "Uno",0
- .db "Une",0
- .db "Uun",0
+ .db "Rf",0
+ .db "Db",0
+ .db "Sg",0
+ .db "Bh",0
+ .db "Hs",0
+ .db "Mt",0
+ .db "Ds",0
+ .db "Rg",0
  .db "La",0
  .db "Ce",0
  .db "Pr",0
@@ -414,13 +417,14 @@ MassNo:
  .db "(222)",0
  .db "(223)",0
  .db "(226)",0
- .db "(261)",0
- .db "(262)",0
- .db "(263)",0
- .db "(262)",0
- .db "(265)",0
- .db "(266)",0
+ .db "(267)",0
+ .db "(268)",0
+ .db "(271)",0
  .db "(272)",0
+ .db "(270)",0
+ .db "(276)",0
+ .db "(281)",0
+ .db "(280)",0
  .db "138.9",0
  .db "140.1",0
  .db "140.9",0
@@ -450,4 +454,128 @@ MassNo:
  .db "(257)",0
  .db "(258)",0
  .db "(259)",0
- .db "(260)",0
+ .db "(262)",0
+
+cursorPos:
+    .db 3, 55  ; H
+    .db 71, 55 ; He
+
+    .db 3, 51  ; Li
+    .db 7, 51
+    .db 51, 51
+    .db 55, 51
+    .db 59, 51
+    .db 63, 51
+    .db 67, 51
+    .db 71, 51 ; Ne
+
+    .db 3, 47  ; Na
+    .db 7, 47
+    .db 51, 47
+    .db 55, 47
+    .db 59, 47
+    .db 63, 47
+    .db 67, 47
+    .db 71, 47 ; Ar
+
+    .db 3, 43  ; K
+    .db 7, 43
+    .db 11, 43
+    .db 15, 43
+    .db 19, 43
+    .db 23, 43
+    .db 27, 43
+    .db 31, 43
+    .db 35, 43
+    .db 39, 43
+    .db 43, 43
+    .db 47, 43
+    .db 51, 43
+    .db 55, 43
+    .db 59, 43
+    .db 63, 43
+    .db 67, 43
+    .db 71, 43 ; Kr
+
+    .db 3, 39  ; Rb
+    .db 7, 39
+    .db 11, 39
+    .db 15, 39
+    .db 19, 39
+    .db 23, 39
+    .db 27, 39
+    .db 31, 39
+    .db 35, 39
+    .db 39, 39
+    .db 43, 39
+    .db 47, 39
+    .db 51, 39
+    .db 55, 39
+    .db 59, 39
+    .db 63, 39
+    .db 67, 39
+    .db 71, 39 ; Xe
+
+    .db 3, 35  ; Cs
+    .db 7, 35
+   ;.db 11, 35 ; La, in the lower group
+    .db 15, 35
+    .db 19, 35
+    .db 23, 35
+    .db 27, 35
+    .db 31, 35
+    .db 35, 35
+    .db 39, 35
+    .db 43, 35
+    .db 47, 35
+    .db 51, 35
+    .db 55, 35
+    .db 59, 35
+    .db 63, 35
+    .db 67, 35
+    .db 71, 35 ; Rn
+
+    .db 3, 31  ; Fr
+    .db 7, 31
+   ;.db 11, 31 ; Ra, in the lower group
+    .db 15, 31
+    .db 19, 31
+    .db 23, 31
+    .db 27, 31
+    .db 31, 31
+    .db 35, 31
+    .db 39, 31
+    .db 43, 31 ; Rg
+
+    .db 3, 24  ; La
+    .db 7, 24
+    .db 11, 24
+    .db 15, 24
+    .db 19, 24
+    .db 23, 24
+    .db 27, 24
+    .db 31, 24
+    .db 35, 24
+    .db 39, 24
+    .db 43, 24
+    .db 47, 24
+    .db 51, 24
+    .db 55, 24
+    .db 59, 24 ; Lu
+
+    .db 3, 20  ; Ac
+    .db 7, 20
+    .db 11, 20
+    .db 15, 20
+    .db 19, 20
+    .db 23, 20
+    .db 27, 20
+    .db 31, 20
+    .db 35, 20
+    .db 39, 20
+    .db 43, 20
+    .db 47, 20
+    .db 51, 20
+    .db 55, 20
+    .db 59, 20 ; Lr
+cursorPos_end:

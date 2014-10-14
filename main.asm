@@ -22,19 +22,34 @@ start:
     pcall(getKeypadLock)
 
     pcall(allocScreenBuffer)
-    pcall(clearBuffer)
 
-    kcall(draw_ui)
 main_loop:
+    kcall(draw_ui)
+.key_loop:
     pcall(flushKeys)
     corelib(appWaitKey)
     kcall(nz, draw_ui)
     cp kMODE
     ret z
     cp kLeft
-    ;jr z, MoveLeft
+    jr z, .left
     cp kRight
-    ;jr z, MoveRight
+    jr z, .right
+    jr .key_loop
+
+.left:
+    kld(a, (current))
+    dec a
+    jr z, main_loop
+    kld((current), a)
+    jr main_loop
+
+.right:
+    kld(a, (current))
+    inc a
+    cp (cursorPos_end - cursorPos) / 2 + 1
+    jr z, main_loop
+    kld((current), a)
     jr main_loop
 
 draw_ui:
@@ -51,17 +66,22 @@ draw_ui:
 .equ table_x 2
 .equ table_y 17
 xor_selector:
-    kld(a,(selectx))
-    ld b, a
-    kld(a,(selecty))
-    ld c, a
+    push hl
+        kld(a, (current)) \ dec a
+        kld(hl, CursorPos)
+        add a, a \ add a, l \ ld l, a
+        jr nc, $+3 \ inc h
+        ld b, (hl) \ inc hl \ ld c, (hl)
+        ld a, b
+        kld((.vertical_loop + 1), a) ; SMC
+    pop hl
     kcall(.vertical_loop)
     dec c
     kcall(.vertical_loop)
     dec c
 ; Displays 4 pixels vertically
 .vertical_loop:
-    kld(a,(selectx))
+    ld a, 0 ; SMC
     ld b, a
     ld a, 3
 .loop:
@@ -176,8 +196,11 @@ draw_element_info:
     ld l, 35
     pcall(rectAND)
     kld(a, (current))
+    dec a
     ld de, 75*256+36
-    pcall(drawDecA)
+    kld(hl, AtomicNo)
+    kcall(getString)
+    pcall(drawStr)
     kld(a, (current))
     dec a
     kld(hl, Symbols)
@@ -212,10 +235,6 @@ getStringL1:
     djnz getStringL1
     ret
 
-selectx:
-    .db 3 ; Initial X position
-selecty:
-    .db 55 ; Initial Y position (inverted)
 current:
     .db 1 ; First element
 
