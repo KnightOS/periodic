@@ -477,50 +477,52 @@ ElemInfo:
 	kcall(Clear)
 	; TODO: Fix this, too
 	kld(hl,ElemText)
-	;bcall(_puts)
+	ld de, 0
+	pcall(drawStr)
 
 	ld bc,11*256+55
 	ld de,83*256+55
 	kcall(_ILine)
 
-	ld de,14*256+1
-	ld hl,Data
-	kcall(fvputs)
-	ld de,21*256+1
-	kcall(fvputs)
-	ld de,28*256+1
-	kcall(fvputs)
-	ld de,35*256+1
-	kcall(fvputs)
+	ld b, 1
+	ld de,1*256+14
+	kld(hl,Data)
+	pcall(drawStr)
+	pcall(newline)
+	kld(hl,Data_2)
+	pcall(drawStr)
 
+	ld b, 45
+	ld de,45*256+14
 	kld(a,(current))
 	dec a
-	ld de,14*256+45
 	kld(hl,Elements)
 	kcall(getString)
-	kcall(fvputs)
+	pcall(drawStr)
 
 	kld(a,(current))
 	dec a
-	ld de,21*256+45
+	pcall(newline)
 	kld(hl,Symbols)
 	kcall(getString)
-	kcall(fvputs)
+	pcall(drawStr)
 
 	kld(a,(current))
 	dec a
-	ld de,28*256+45
+	pcall(newline)
 	kld(hl,AtomicNo)
 	kcall(getString)
-	kcall(fvputs)
+	pcall(drawStr)
 
 	kld(a,(current))
 	dec a
-	ld de,35*256+45
+	pcall(newline)
 	kld(hl,MassNo)
 	kcall(getString)
-	kcall(fvputs)
+	pcall(drawStr)
 
+	pcall(fastCopy)
+	pcall(flushKeys)
 	pcall(waitKey)
 RetStart:
 	kcall(Clear)
@@ -587,8 +589,9 @@ ElemText:
  .db "  Element Info  ", 0
 Data:
  .db "Element:",0
- .db "Symbol:",0
- .db "Atomic ",0x23,":", 0
+Data_2:
+ .db "Symbol:\n"
+ .db "Atomic No:\n"
  .db "Atomic Mass:",0
 HelpStr:
  .db "[?]: Help",0
