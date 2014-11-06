@@ -327,7 +327,7 @@ Symbols:
  .db "Tm",0
  .db "Yb",0
  .db "Lu",0
- .db "La",0
+ .db "Ac",0
  .db "Th",0
  .db "Pa",0
  .db "U",0
