@@ -53,3 +53,19 @@ pencol:
     .db 0
 penrow:
     .db 0
+
+drawStr_custom:
+    ld a, (hl)
+    cp '.'
+    jr z, _
+    or a
+    ret z
+    pcall(drawChar)
+    inc hl
+    jr drawStr_custom
+_:
+    dec d
+    pcall(drawChar)
+    dec d
+    inc hl
+    jr drawStr_custom

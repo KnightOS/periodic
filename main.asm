@@ -287,7 +287,7 @@ _:  pcall(drawStr)
     kld(hl, massNo)
     kcall(getString)
     ld de, 75*256+48
-    pcall(drawStr)
+    kcall(drawStr_custom)
     ret
 
 getString:
